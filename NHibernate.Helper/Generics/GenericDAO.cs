@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NHibernate;
+using NHibernate.Criterion;
 
 namespace NHibernate.Helper.Generics
 {
@@ -35,13 +36,36 @@ namespace NHibernate.Helper.Generics
         {
             foreach (T item in o)
             {
-                Save(item);
+                try
+                {
+                    Save(item);
+                }
+                catch (System.Exception)
+                {
+                    throw;
+                }
             }
         }
 
+        /// <summary>
+        /// Salva ou atualiza
+        /// </summary>
+        /// <param name="o">Object do Tipo T</param>
         protected internal void SaveOrUpdate(T o)
         {
             Session.SaveOrUpdate(o);
+        }
+
+        /// <summary>
+        /// Salva ou atualiza uma lista
+        /// </summary>
+        /// <param name="o">Object do Tipo T</param>
+        protected internal void SaveOrUpdate(IList<T> list)
+        {
+            foreach (T item in list)
+            {
+                Session.SaveOrUpdate(item);
+            }
         }
 
         /// <summary>
@@ -72,6 +96,26 @@ namespace NHibernate.Helper.Generics
         }
 
         /// <summary>
+        /// Atualizar uma lista de objetos
+        /// </summary>
+        /// <param name="o"></param>
+        protected internal void Update(IList<T> list)
+        {
+            foreach (var item in list)
+            {
+                try
+                {
+                    Session.Update(item);
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// Recupera um ID especifico
         /// </summary>
         /// <param name="id"></param>
@@ -81,7 +125,12 @@ namespace NHibernate.Helper.Generics
             return Session.Load<T>(id);
         }
 
-
+        /// <summary>
+        /// Recupera um registro mesmo em lock
+        /// </summary>
+        /// <param name="id">identificador</param>
+        /// <param name="shoudLock">LockMode Upgrade</param>
+        /// <returns>Object do Tipo T</returns>
         protected internal T GetById(TID id, bool shoudLock)
         {
             T entity;
@@ -131,11 +180,38 @@ namespace NHibernate.Helper.Generics
         }
 
         /// <summary>
+        /// Realiza a consulta utilizando um objeto de exemplo, funciona sempre no nivel do objeto pai
+        /// </summary>
+        /// <param name="obj">Objeto utilizado de exemplo</param>
+        /// <param name="mode">Tipo de like utilizado na consulta</param>
+        /// <returns>Lista de objetos</returns>
+        protected internal IList<T> QueryByExample(T obj, MatchMode mode)
+        {
+            Example example = Example.Create(obj).EnableLike(mode);
+            return Session.CreateCriteria(typeof(T)).Add(example).List<T>();
+        }
+
+        protected internal Example CreateExample(object entity)
+        {
+            return Example.Create(entity);
+        }
+
+        /// <summary>
         /// Commit das alterações se necessario
         /// </summary>
-        protected internal void CommitChanges()
+        protected void CommitChanges()
         {
+            ISession session = Management.SessionManager.Session;
+            //session.Flush();
+            if (session.Transaction != null && session.Transaction.IsActive)
+                session.Transaction.Commit();
+        }
 
+        protected void RollbackTransaction()
+        {
+            ISession session = Management.SessionManager.Session;
+            if (session.Transaction != null && session.Transaction.IsActive)
+                session.Transaction.Rollback();
         }
 
         /// <summary>
@@ -145,6 +221,31 @@ namespace NHibernate.Helper.Generics
         protected internal ICriteria CreateCriteria()
         {
             return Session.CreateCriteria(persitentType);
+        }
+
+        /// <summary>
+        /// Retorna uma Query do Hibernate
+        /// </summary>
+        /// <param name="queryString">string hql</param>
+        /// <returns>IQuery</returns>
+        protected IQuery CreateQuery(String queryString)
+        {
+            return Session.CreateQuery(queryString);
+        }
+
+        protected ISQLQuery CreateSqlQuery(String queryString)
+        {
+            return Session.CreateSQLQuery(queryString);
+        }
+
+        protected IMultiQuery CreateMultiQuery()
+        {
+            return Session.CreateMultiQuery();
+        }
+
+        protected IMultiCriteria CreateMultiCriteria()
+        {
+            return Session.CreateMultiCriteria();
         }
 
         /// <summary>

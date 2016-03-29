@@ -1,7 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.Helper", "NHibernate.Helper\NHibernate.Helper.csproj", "{A1BA87F1-43B2-4D40-A8E7-0E42D9114745}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{44E53B56-7B53-493D-A5C7-25936AFA0796}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{260CD36C-D545-445A-AC42-620A16C0A6B5}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,5 +25,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A1BA87F1-43B2-4D40-A8E7-0E42D9114745} = {44E53B56-7B53-493D-A5C7-25936AFA0796}
 	EndGlobalSection
 EndGlobal

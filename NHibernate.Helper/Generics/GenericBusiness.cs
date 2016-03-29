@@ -13,29 +13,30 @@ namespace NHibernate.Helper.Generics
         private TDao _dao;
         #endregion
 
-        public TDao Dao
+        protected internal TDao Dao
         {
             get
             {
-                if (_dao == null)
-                    _dao = new TDao();
+                if (_dao == null) _dao = new TDao();
                 return _dao;
             }
         }
 
+        [Aspect.TransactionManagementAspect]
         public virtual void Save(T obj)
         {
             try
             {
                 Dao.Save(obj);
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
                 //TODO Impementar camada de log
-                throw e;
+                throw;
             }
         }
 
+        [Aspect.TransactionManagementAspect]
         public virtual void Save(List<T> listObj)
         {
             try
@@ -49,6 +50,41 @@ namespace NHibernate.Helper.Generics
             }
         }
 
+        [Aspect.TransactionManagementAspect]
+        public virtual void SaveOrUpdate(T obj)
+        {
+            try
+            {
+                Dao.SaveOrUpdate(obj);
+            }
+            catch (System.Exception)
+            {
+                //TODO Impementar camada de log
+                throw;
+            }
+        }
+
+        [Aspect.TransactionManagementAspect]
+        public virtual void SaveOrUpdate(IList<T> list)
+        {
+            try
+            {
+                Dao.SaveOrUpdate(list);
+            }
+            catch (System.Exception)
+            {
+                //TODO Impementar camada de log
+                throw;
+            }
+        }
+
+        public virtual T SaveAndReturn(T obj)
+        {
+            Save(obj);
+            return obj;
+        }
+
+        [Aspect.TransactionManagementAspect]
         public virtual void Delete(TID id)
         {
             try
@@ -62,6 +98,7 @@ namespace NHibernate.Helper.Generics
             }
         }
 
+        [Aspect.TransactionManagementAspect]
         public virtual void Delete(T obj)
         {
             try
@@ -75,13 +112,14 @@ namespace NHibernate.Helper.Generics
             }
         }
 
+        [Aspect.TransactionManagementAspect]
         public virtual void Delete(List<T> listObj)
         {
             try
             {
                 foreach (T item in listObj)
                 {
-                    Delete(item);
+                    Dao.Delete(item);
                 }
             }
             catch (System.Exception e)
@@ -91,6 +129,7 @@ namespace NHibernate.Helper.Generics
             }
         }
 
+        [Aspect.TransactionManagementAspect]
         public virtual void Update(T obj)
         {
             try
