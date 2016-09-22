@@ -22,7 +22,7 @@ namespace NHibernate.Helper.Management
         /// Não abre uma conexão com o banco até que seja necessártio. (Open Session In View)
         /// </summary>
         private void BeginTransaction(object sender, EventArgs e) {
-            SessionManager.InitNHibernateSession();
+            SessionManager.OpenSession();
         }
 
         /// <summary>

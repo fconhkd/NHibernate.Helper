@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NHibernate.Helper.Management;
 
 namespace NHibernate.Helper.Generics
 {
@@ -200,13 +201,67 @@ namespace NHibernate.Helper.Generics
             return Dao.Count();
         }
 
+        public virtual void BeginTransaction()
+        {
+            //begin trans   
+            var session = SessionManager.Session;
+            if (!session.Transaction.IsActive)
+                session.BeginTransaction();
+        }
+
+        public virtual void CommitTransaction()
+        {
+            var session = SessionManager.Session;
+            if (session.Transaction != null &&
+                        session.Transaction.IsActive)
+            {
+                session.Flush(); session.Transaction.Commit();
+            }
+        }
+
+        public virtual void RollbackTransaction()
+        {
+            var session = SessionManager.Session;
+            if (session.Transaction != null &&
+                session.Transaction.IsActive)
+            {
+                session.Transaction.Rollback();
+            }
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~GenericBusiness() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            //if (_dao != null)
-            //{
-            //    _dao.Dispose();
-            //    _dao = null;
-            //}
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }

@@ -28,10 +28,10 @@ namespace NHibernate.Helper.Management
         }
 
         /// <summary>
-        /// Retorna uma nova Session.
+        /// Retorna uma nova Session para ser usado na aplicação
         /// </summary>
         /// <returns>ISession</returns>
-        protected static ISession OpenSession()
+        protected static ISession GetSession()
         {
             return GetSessionFactory().OpenSession();
         }
@@ -39,10 +39,10 @@ namespace NHibernate.Helper.Management
         /// <summary>
         /// Cria e inicializa a sessão para ser usada no contexto.
         /// </summary>
-        public static void InitNHibernateSession()
+        public static void OpenSession()
         {
             //Seta uma sessão nova para ser usada.
-            Session = OpenSession();
+            Session = GetSession();
         }
 
         /// <summary>
@@ -82,7 +82,16 @@ namespace NHibernate.Helper.Management
         {
             if (_sessionFactory == null)
             {
-                _sessionFactory = new Configuration().Configure().BuildSessionFactory();
+                var configuration = new Configuration();
+                try
+                {
+                    configuration.Configure();
+                    _sessionFactory = configuration.BuildSessionFactory();
+                }
+                catch (System.Exception ex)
+                {
+                    throw ex;
+                }
             }
         }
 

@@ -17,7 +17,7 @@ namespace NHibernate.Helper.Management
         /// </summary>
         private void BeginTransaction(object sender, EventArgs e)
         {
-            SessionManager.InitNHibernateSession();
+            SessionManager.OpenSession();
         }
 
         /// <summary>
