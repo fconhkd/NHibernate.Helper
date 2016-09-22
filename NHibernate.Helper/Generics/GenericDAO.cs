@@ -122,7 +122,7 @@ namespace NHibernate.Helper.Generics
         /// <returns></returns>
         protected internal T GetById(TID id)
         {
-            return Session.Load<T>(id);
+            return Session.Get<T>(id);
         }
 
         /// <summary>

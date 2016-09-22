@@ -5,7 +5,6 @@ using NHibernate.Helper.Management;
 namespace NHibernate.Helper.Generics
 {
     [Serializable]
-    [Aspect.TransactionManagementAspect]
     public abstract class GenericBusiness<TID, T, TDao> : IDisposable
         where T : GenericEntity<TID>
         where TDao : GenericDAO<TID, T>, new()
@@ -38,7 +37,7 @@ namespace NHibernate.Helper.Generics
         }
 
         [Aspect.TransactionManagementAspect]
-        public virtual void Save(List<T> listObj)
+        public virtual void Save(IList<T> listObj)
         {
             try
             {
