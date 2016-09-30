@@ -5,6 +5,7 @@ using NHibernate.Helper.Management;
 namespace NHibernate.Helper.Generics
 {
     [Serializable]
+    [Aspect.SessionManagementAspect(AspectPriority = 0, AttributeInheritance = PostSharp.Extensibility.MulticastInheritance.Strict)]
     public abstract class GenericBusiness<TID, T, TDao> : IDisposable
         where T : GenericEntity<TID>
         where TDao : GenericDAO<TID, T>, new()
@@ -12,6 +13,12 @@ namespace NHibernate.Helper.Generics
         #region Fields
         private TDao _dao;
         #endregion
+
+        public GenericBusiness()
+        {
+            //Management.SessionManager.GetCurrentSession();
+            Management.SessionManager.Instance.GetSession();
+        }
 
         protected internal TDao Dao
         {
@@ -22,7 +29,7 @@ namespace NHibernate.Helper.Generics
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void Save(T obj)
         {
             try
@@ -36,7 +43,7 @@ namespace NHibernate.Helper.Generics
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void Save(IList<T> listObj)
         {
             try
@@ -50,21 +57,21 @@ namespace NHibernate.Helper.Generics
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void SaveOrUpdate(T obj)
         {
             try
             {
                 Dao.SaveOrUpdate(obj);
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 //TODO Impementar camada de log
-                throw;
+                throw ex;
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void SaveOrUpdate(IList<T> list)
         {
             try
@@ -84,7 +91,7 @@ namespace NHibernate.Helper.Generics
             return obj;
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void Delete(TID id)
         {
             try
@@ -98,7 +105,7 @@ namespace NHibernate.Helper.Generics
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void Delete(T obj)
         {
             try
@@ -112,7 +119,21 @@ namespace NHibernate.Helper.Generics
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
+        public virtual int Delete(String query)
+        {
+            try
+            {
+                return Dao.Delete(query);
+            }
+            catch (System.Exception e)
+            {
+                //TODO Impementar camada de log
+                throw e;
+            }
+        }
+
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void Delete(List<T> listObj)
         {
             try
@@ -129,7 +150,7 @@ namespace NHibernate.Helper.Generics
             }
         }
 
-        [Aspect.TransactionManagementAspect]
+        [Aspect.TransactionManagementAspect(AspectPriority = 1)]
         public virtual void Update(T obj)
         {
             try
@@ -154,6 +175,7 @@ namespace NHibernate.Helper.Generics
                 //TODO Impementar camada de log
                 throw e;
             }
+
         }
 
         public virtual List<T> GetAll()
@@ -200,32 +222,34 @@ namespace NHibernate.Helper.Generics
             return Dao.Count();
         }
 
+        public virtual void Evict(T o)
+        {
+            Dao.Evict(o);
+        }
+
         public virtual void BeginTransaction()
         {
             //begin trans   
-            var session = SessionManager.Session;
-            if (!session.Transaction.IsActive)
-                session.BeginTransaction();
+            //var session = SessionManager.Session;
+            //if (!session.Transaction.IsActive)
+            //    session.BeginTransaction();
+            Management.SessionManager.Instance.BeginTransaction();
         }
 
         public virtual void CommitTransaction()
         {
-            var session = SessionManager.Session;
-            if (session.Transaction != null &&
-                        session.Transaction.IsActive)
-            {
-                session.Flush(); session.Transaction.Commit();
-            }
+            //var session = SessionManager.Session;
+            //if (session.Transaction != null &&
+            //            session.Transaction.IsActive)
+            //{
+            //    session.Flush(); session.Transaction.Commit();
+            //}
+            Management.SessionManager.Instance.CommitTransaction();
         }
 
         public virtual void RollbackTransaction()
         {
-            var session = SessionManager.Session;
-            if (session.Transaction != null &&
-                session.Transaction.IsActive)
-            {
-                session.Transaction.Rollback();
-            }
+            Management.SessionManager.Instance.RollbackTransaction();
         }
 
         #region IDisposable Support
@@ -238,6 +262,10 @@ namespace NHibernate.Helper.Generics
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
+                    //var session = Management.SessionManager.Session;
+                    //session.Close();
+                    //Management.SessionManager.Session = null;
+                    Management.SessionManager.Instance.CloseSession();
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

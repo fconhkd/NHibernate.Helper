@@ -15,7 +15,8 @@ namespace NHibernate.Helper.Generics
         {
             get
             {
-                return Management.SessionManager.Session;
+                return Management.SessionManager.Instance.GetSession();
+                //return Management.SessionManager.GetCurrentSession();
             }
         }
 
@@ -84,6 +85,16 @@ namespace NHibernate.Helper.Generics
         protected internal void Delete(TID id)
         {
             Delete(GetById(id));
+        }
+
+        /// <summary>
+        /// Deleta todos objetos retornados pela query
+        /// </summary>
+        /// <param name="query">query para pesquisa</param>
+        /// <returns>quantidados de registros</returns>
+        protected internal int Delete(string query)
+        {
+            return Session.Delete(query);
         }
 
         /// <summary>
@@ -197,24 +208,6 @@ namespace NHibernate.Helper.Generics
         }
 
         /// <summary>
-        /// Commit das alterações se necessario
-        /// </summary>
-        protected void CommitChanges()
-        {
-            ISession session = Management.SessionManager.Session;
-            //session.Flush();
-            if (session.Transaction != null && session.Transaction.IsActive)
-                session.Transaction.Commit();
-        }
-
-        protected void RollbackTransaction()
-        {
-            ISession session = Management.SessionManager.Session;
-            if (session.Transaction != null && session.Transaction.IsActive)
-                session.Transaction.Rollback();
-        }
-
-        /// <summary>
         /// Retorna uma criteria do tipo
         /// </summary>
         /// <returns></returns>
@@ -255,6 +248,15 @@ namespace NHibernate.Helper.Generics
         {
             ICriteria criteria = CreateCriteria();
             return criteria.SetProjection(NHibernate.Criterion.Projections.RowCount()).UniqueResult<int>();
+        }
+
+        /// <summary>
+        /// Remove o objeto do cache
+        /// </summary>
+        /// <param name="o">obj a ser removido do cache</param>
+        protected internal void Evict(T o)
+        {
+            Session.Evict(o);
         }
 
         protected internal System.Type persitentType = typeof(T);

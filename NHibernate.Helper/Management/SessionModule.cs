@@ -22,7 +22,7 @@ namespace NHibernate.Helper.Management
         /// Não abre uma conexão com o banco até que seja necessártio. (Open Session In View)
         /// </summary>
         private void BeginTransaction(object sender, EventArgs e) {
-            SessionManager.OpenSession();
+            SessionManager.Instance.BeginTransaction();
         }
 
         /// <summary>
@@ -30,10 +30,14 @@ namespace NHibernate.Helper.Management
         /// Assume que a transação foi inicializada pelo <see cref="TransactionManagementAspect"/>
         /// </summary>
         private void CommitAndCloseSession(object sender, EventArgs e) {
-            ISession session = SessionManager.Session;
-            //fechando e finalizando a sessão do contexto
-            session.Close();
-            SessionManager.Session = null;
+            try
+            {
+                SessionManager.Instance.CommitTransaction();
+            }
+            finally
+            {
+                SessionManager.Instance.CloseSession();
+            }
         }
 
         public void Dispose() { }
