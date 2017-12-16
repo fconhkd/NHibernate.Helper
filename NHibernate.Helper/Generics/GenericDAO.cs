@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NHibernate;
 using NHibernate.Criterion;
 
@@ -239,6 +240,15 @@ namespace NHibernate.Helper.Generics
         protected IMultiCriteria CreateMultiCriteria()
         {
             return Session.CreateMultiCriteria();
+        }
+
+        /// <summary>
+        /// Cria um novo Linq <see cref="IQueryable{out T}"/> para a classe de entidade
+        /// </summary>
+        /// <returns>novo <see cref="IQueryable{T}"/> </returns>
+        protected IQueryable<T> GetQuery()
+        {
+            return Session.Query<T>();
         }
 
         /// <summary>
