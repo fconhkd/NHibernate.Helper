@@ -169,6 +169,16 @@ namespace NHibernate.Helper.Generics
         }
 
         /// <summary>
+        /// Metodo para retornar objetos usando LINQ
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        protected internal IQueryable<T> Get()
+        {
+            return Session.Query<T>();
+        }
+
+        /// <summary>
         /// Metodo Generico, Recupera um unico objeto por Query
         /// </summary>
         /// <param name="query"></param>

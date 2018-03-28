@@ -84,7 +84,7 @@ namespace NHibernate.Helper.Management
             {
                 if (interceptor != null)
                 {
-                    session = GetSessionFactory().OpenSession(interceptor);
+                    session = GetSessionFactory().WithOptions().Interceptor(interceptor).OpenSession();// OpenSession(interceptor);
                 }
                 else
                 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NHibernate.Helper.Management;
 
 namespace NHibernate.Helper.Generics
@@ -162,6 +163,15 @@ namespace NHibernate.Helper.Generics
                 //TODO Impementar camada de log
                 throw e;
             }
+        }
+
+        /// <summary>
+        /// Metodos para realizar consultas usando LINQ
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<T> Get()
+        {
+            return Dao.Get();
         }
 
         public virtual T GetById(TID id)
